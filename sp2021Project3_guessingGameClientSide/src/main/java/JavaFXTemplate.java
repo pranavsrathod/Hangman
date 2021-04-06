@@ -88,12 +88,16 @@ public class JavaFXTemplate extends Application {
 		borderPane.setCenter(root);
 				
 		Scene welcome = new Scene(borderPane, 600,600);
+		
 		this.start.setOnAction(e-> {primaryStage.setScene(sceneMap.get("choose"));
 		primaryStage.setTitle("This is a client");
 		clientConnection = new Client(data->{
 		Platform.runLater(()->{
 			clientConnection.data = (GameStatus) data;
 			label2.setText(clientConnection.data.GuessingString);
+			if(clientConnection.data.winFlag) {
+				label2.setText("CATEGORY WON!! PICK ANOTHER ONE");
+			}
 		});
 		}, Integer.parseInt(t1.getText()));
 		clientConnection.start();
@@ -101,7 +105,7 @@ public class JavaFXTemplate extends Application {
 		pressButton = new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event) {
 				Button b = (Button)event.getSource();
-				System.out.print(b.getText());
+				//System.out.print(b.getText());
 				String s = b.getText();
 				if (countCat == 0) {
 					Cat1.setText(s);
@@ -216,8 +220,11 @@ public class JavaFXTemplate extends Application {
 //		clientConnection.data.guess_letter = t1.getText();
 		check.setOnAction(e->{
 			String temp = t1.getText().toLowerCase();
-			clientConnection.data.guess_letter = temp.charAt(0);
-			clientConnection.send(clientConnection.data); 
+//			if(temp.length() == 1) {
+				clientConnection.data.guess_letter = temp.charAt(0);
+				clientConnection.data.sentChar = true;
+				clientConnection.send(clientConnection.data);
+//			}
 			t1.clear();
 			// temp = "";
 			});
@@ -246,4 +253,3 @@ public class JavaFXTemplate extends Application {
 	}
 
 }
-
