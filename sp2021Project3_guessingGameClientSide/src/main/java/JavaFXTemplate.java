@@ -1,3 +1,4 @@
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -20,6 +21,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -38,8 +40,9 @@ public class JavaFXTemplate extends Application {
 	private Button b5;
 	private Button b6;
 	private Button Cat1 = new Button("");
-	private Button Cat2 = new Button("");;
-	private Button Cat3 = new Button("");;
+	private Button Cat2 = new Button("");
+	private Button Cat3 = new Button("");
+	private Button currentCat;
 	public Stage dummyStage;
 	private VBox root;
 	private MenuBar menu;
@@ -54,7 +57,8 @@ public class JavaFXTemplate extends Application {
 	private Label label3;
 	private Label label4;
 	private Label label5;
-	private Label label6;
+	private Label label6 = new Label();
+	Label endMessage = new Label("Game Over");
 	private Image img;
 	private ImageView view;
 	int countCat;
@@ -94,7 +98,7 @@ public class JavaFXTemplate extends Application {
 		root.setAlignment(Pos.CENTER);
 		borderPane = new BorderPane();
 		borderPane.setCenter(root);
-				
+		
 		Scene welcome = new Scene(borderPane, 600,600);
 		
 		this.start.setOnAction(e-> {primaryStage.setScene(sceneMap.get("choose"));
@@ -103,23 +107,9 @@ public class JavaFXTemplate extends Application {
 		Platform.runLater(()->{
 			clientConnection.data = (GameStatus) data;
 			label2.setText(clientConnection.data.GuessingString);
-			if(clientConnection.data.winFlag) {
-				label2.setText("CATEGORY WON!! PICK ANOTHER ONE");
-			}
-			if (clientConnection.data.countWrong != 0) { 
-//				if (clientConnection.data.countWrong == 1) {
-//					image = "Hangman2.jpeg";
-//				} else if (clientConnection.data.countWrong == 2) {
-//					image = "Hangman3.jpeg";
-//				} else if (clientConnection.data.countWrong == 3) {
-//					image = "Hangman4.jpeg";
-//				} else if (clientConnection.data.countWrong == 4) {
-//					image = "Hangman5.jpeg";
-//				} else if (clientConnection.data.countWrong == 5) {
-//					image = "Hangman6.jpeg";
-//				} else {
-//					image = "Hangman7.jpeg";
-//				}
+			
+			Button butArray[] = {Cat1, Cat2, Cat3};
+			if (clientConnection.data.countWrong != 0) {
 				image = "Hangman" + (clientConnection.data.countWrong) + ".jpeg";
 				System.out.println(image);
 				img = new Image(image);
@@ -127,8 +117,63 @@ public class JavaFXTemplate extends Application {
 				view.setFitHeight(300);
 				view.setPreserveRatio(true);
 				label6.setGraphic(view);
-				label4.setText("Number of Misses: " + clientConnection.data.countWrong);
 				label5.setText("");
+			}
+			label4.setText("Number of Misses: " + clientConnection.data.countWrong);
+			if (clientConnection.data.winFlag) {
+				String temp = clientConnection.data.clientMessage;
+				if (temp.equals("Category Won")) {
+					label2.setText("CATEGORY WON!! PICK ANOTHER ONE");
+					PauseTransition halt = new PauseTransition(Duration.seconds(3));
+					halt.setOnFinished(p -> {
+						boolean array[] = clientConnection.data.winArray;
+						for(int i = 0; i < 3; i++) {
+							//System.out.println(array[i]);
+							if(!array[i]) {
+								butArray[i].setDisable(false);
+							}
+						}
+						clientConnection.data.winFlag = false;
+						clientConnection.data.GuessingString = "";
+						clientConnection.data.countWrong = 0;
+						clientConnection.data.clientMessage = "";
+					});
+					halt.play();
+				} else if (temp.equals("Client Wins Game")) {
+					endMessage.setText("CONGRATULATIONS YOU WON THE GAME");
+					PauseTransition halt = new PauseTransition(Duration.seconds(3));
+					halt.setOnFinished(p -> {
+						primaryStage.setScene(sceneMap.get("end"));
+					});
+					halt.play();
+				}
+			}
+			if (clientConnection.data.countWrong == 6) {
+				String temp = clientConnection.data.clientMessage;
+				if (temp.equals("Category Lost")) {
+					PauseTransition halt = new PauseTransition(Duration.seconds(3));
+					halt.setOnFinished(p -> {
+						label2.setText("Category Lost " + clientConnection.data.attemptsLeft[clientConnection.data.attemptIndex] + "/3 attempts from this catgory remain");
+						boolean array[] = clientConnection.data.winArray;
+						for(int i = 0; i < 3; i++) {
+							if(!array[i]) {
+								butArray[i].setDisable(false);
+							}
+						}
+						currentCat.setStyle("-fx-background-color: White");
+						clientConnection.data.GuessingString = "";
+						clientConnection.data.countWrong = 0;
+						clientConnection.data.clientMessage = "";
+					});
+					halt.play();
+				} else if (temp.equals("Client Looses Game")) {
+					endMessage.setText("YOU COULD NOT SAVE, THE TEAM, GAME OVER");
+					PauseTransition halt = new PauseTransition(Duration.seconds(3));
+					halt.setOnFinished(p -> {
+						dummyStage.setScene(sceneMap.get("end"));
+					});
+					halt.play();
+				}
 			}
 //			if (clientConnection.data.countWrong == 6) {
 //				dummyStage.setScene(sceneMap.get("lose"));
@@ -166,19 +211,27 @@ public class JavaFXTemplate extends Application {
 				for(int i = 0; i < 3; i++) {
 					if (b != array[i]) {
 						array[i].setDisable(true);
+					} else {
+						clientConnection.data.attemptIndex = i;
 					}
 				}
 				b.setDisable(true);
+				currentCat = b;
 				clientConnection.data.choiceMade = true;
 				clientConnection.data.currentCategory = b.getText();
 				clientConnection.send(clientConnection.data);
+				image = "Hangman0.jpeg";
+				img = new Image(image);
+				view = new ImageView(img);
+				view.setFitHeight(300);
+				view.setPreserveRatio(true);
+				label6.setGraphic(view);
 			}
 			};
 		sceneMap.put("welcome", welcome);
 		sceneMap.put("choose", getCategories());
 		sceneMap.put("game", gameScene());
-		sceneMap.put("win", winScene());
-		sceneMap.put("lose", loseScene());
+		sceneMap.put("end", endScene());
 		dummyStage.setScene(sceneMap.get("welcome"));
 		dummyStage.show();
 	}
@@ -234,12 +287,12 @@ public class JavaFXTemplate extends Application {
 		Button check = new Button("Check");
 		Button clear = new Button("Clear");
 		// Graphics -----------------------------------------------------
-		label6 = new Label();
-		img = new Image(image);
-		view = new ImageView(img);
-		view.setFitHeight(300);
-		view.setPreserveRatio(true);
-		label6.setGraphic(view);
+//		label6 = new Label();
+//		img = new Image(image);
+//		view = new ImageView(img);
+//		view.setFitHeight(300);
+//		view.setPreserveRatio(true);
+//		label6.setGraphic(view);
 		// Graphics  ----------------------------------------------------
 		HBox box = new HBox(10, Cat1, Cat2, Cat3);
 		box.setAlignment(Pos.CENTER);
@@ -270,14 +323,15 @@ public class JavaFXTemplate extends Application {
 //		clientConnection.data.guess_letter = t1.getText();
 		check.setOnAction(e->{
 			String temp = t1.getText().toLowerCase();
-//			if(temp.length() == 1) {
+			if(temp.length() == 1) {
 				clientConnection.data.guess_letter = temp.charAt(0);
 				clientConnection.data.sentChar = true;
 				clientConnection.send(clientConnection.data);
-//			}
+			}
 			t1.clear();
 			// temp = "";
 			});
+		clear.setOnAction(e -> t1.clear());
 		//Cat1.setOnAction(e -> dummyStage.setScene(sceneMap.get("win")));
 		// Border Pane
 		gamePane = new BorderPane();
@@ -286,31 +340,14 @@ public class JavaFXTemplate extends Application {
 		return new Scene(gamePane, 600, 600);
 	}
 	
-	public Scene winScene() {
+	public Scene endScene() {
 		Button playAgain = new Button("playAgain");
 		Button exit = new Button("Exit");
 		exit.setOnAction(e -> System.exit(0));
-		Label label = new Label("Game Over");
-		label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+		endMessage.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		HBox hbox = new HBox(10, playAgain, exit);
 		hbox.setAlignment(Pos.CENTER);
-		VBox vbox = new VBox(100, label, hbox);
-		vbox.setAlignment(Pos.CENTER);
-		BorderPane pane = new BorderPane();
-		pane.setCenter(vbox);
-		return new Scene(pane, 400, 400);
-		
-	}
-	
-	public Scene loseScene() {
-		Button playAgain = new Button("playAgain");
-		Button exit = new Button("Exit");
-		exit.setOnAction(e -> System.exit(0));
-		Label label = new Label("YOU LOST !!");
-		label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-		HBox hbox = new HBox(10, playAgain, exit);
-		hbox.setAlignment(Pos.CENTER);
-		VBox vbox = new VBox(100, label, hbox);
+		VBox vbox = new VBox(100, endMessage, hbox);
 		vbox.setAlignment(Pos.CENTER);
 		BorderPane pane = new BorderPane();
 		pane.setCenter(vbox);
