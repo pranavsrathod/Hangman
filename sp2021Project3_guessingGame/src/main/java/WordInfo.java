@@ -1,115 +1,136 @@
-
+// server side
+import java.io.Serializable;
 import java.util.HashMap;
-
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
-public class GuiServer extends Application{
-
+import java.util.*;
+public class GameStatus  implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public String wordToGuess;
+	public String currentCategory;
+	public String current_progress;
+	public char guess_letter;
+	public String GuessingString = "";
+	public char wordArray[];
+	boolean choiceMade;
+	boolean sentChar;
+	boolean validChar;
+	boolean winFlag;
+	int countWrong;
+	int winCounter;
+	int attemptsLeft[] = {3, 3, 3};
+	boolean winArray[] = {false, false, false};
+	int attemptIndex;
+	String clientMessage;
 	
-	TextField s1,s2,s3,s4, c1;
-	Button serverChoice,clientChoice,b1;
-	HashMap<String, Scene> sceneMap;
-	GridPane grid;
-	HBox buttonBox;
-	VBox clientBox;
-	Scene startScene;
-	BorderPane startPane;
-	Server serverConnection;
 	
-	ListView<String> listItems, listItems2;
+	private String cat1[] = {"iron man", "captain america", "black widow", "thor", "hawkeye", "hulk", "scarlet witch", "vision", "falcon", "winter soldier",
+			"captain marvel", "nick fury", "doctor strange", "spiderman", "war machine"};
+	
+	private String cat2[] = {"meryl streep", "tom hanks", "leonardo dicaprio", "taylor swift", "anne hathaway", "robert de niro", "emily blunt",
+			"scarlett johannson", "beyonce", "oprah winfrey", "tom cruise", "halle berry"};
+	
+	private String cat3[] = {"pizza", "pasta", "yogurt", "burger", "burrito", "taco", "quesadilla", "avocado", "milkshake", "banana", "sandwich", "chicken wings"};
+	
+	private String cat4[] = {"target", "apple", "sony", "champion", "toyota", "ikea", "reebok", "puma", "adidas", "nike", "samsung", "microsoft", "amazon", "nintendo"};
+	
+	private String cat5[] = {"usa", "india", "switzerland", "germany", "france", "kenya", "austrailia", "brazil", "argentina", "chile", "italy", "canada", "mexico", "singapore", "thailand", "japan"};
+	
+	private String cat6[] = {"alligator", "antelope", "bear", "butterfly", "cobra", "deer", "elephant", "flamingo", "goldfish", "kangaroo", "leopard", "mongoose", "rhinoceros", "zebra"};
 	
 	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		launch(args);
-	}
-
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		// TODO Auto-generated method stub
-		c1 = new TextField();
-		primaryStage.setTitle("Welcome to the Server");
-		Label label = new Label("Enter Port Number:");
-		this.serverChoice = new Button("Login");
-		buttonBox = new HBox(10, label, serverChoice);
-		
-		this.serverChoice.setOnAction(e->{ primaryStage.setScene(sceneMap.get("server"));
-											primaryStage.setTitle("This is the Server");
-				serverConnection = new Server(data -> {
-					Platform.runLater(()->{
-						listItems.getItems().add(data.toString());
-					});
-
-				},Integer.parseInt(c1.getText()));
-											
-		});
-		VBox vbox = new VBox(10, buttonBox, c1);
-		vbox.setAlignment(Pos.CENTER);
-		startPane = new BorderPane();
-		startPane.setCenter(vbox);
-		
-		startScene = new Scene(startPane, 400,400);
-		
-		listItems = new ListView<String>();
-		listItems2 = new ListView<String>();
-//		b1 = new Button("Send");
-//		b1.setOnAction(e->{clientConnection.send(c1.getText()); c1.clear();});
-		
-		sceneMap = new HashMap<String, Scene>();
-		
-		sceneMap.put("server",  createServerGui());
-//		sceneMap.put("client",  createClientGui());
-		
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent t) {
-                Platform.exit();
-                System.exit(0);
-            }
-        });
-		
-		 
-		
-		primaryStage.setScene(startScene);
-		primaryStage.show();
+	
+	
+	private HashMap<String, String[]> categories;
+	GameStatus(){
+		attemptIndex = -1;
+		winCounter = 0;
+		countWrong = 0;
+		sentChar = false;
+		validChar = false;
+		winFlag = false;
+		wordToGuess = "";
+		currentCategory = "";
+		current_progress = "";
+		guess_letter = '\0';
+		choiceMade = false;
+		categories = new HashMap<String, String[]>();
+		categories.put("Marvel", cat1);
+		categories.put("Celebrities", cat2);
+		categories.put("Food", cat3);
+		categories.put("Brands", cat4);
+		categories.put("Countries", cat5);
+		categories.put("Animals", cat6);
 		
 	}
 	
-	public Scene createServerGui() {
-		
-		BorderPane pane = new BorderPane();
-		pane.setPadding(new Insets(70));
-		pane.setStyle("-fx-background-color: coral");
-		
-		pane.setCenter(listItems);
-	
-		return new Scene(pane, 500, 400);
-		
-		
+	public void getWord(String category) {
+		Random randomNumber = new Random();
+		String tempArray[] = categories.get(category);
+		int index = randomNumber.nextInt(tempArray.length - 1);
+		currentCategory = category;
+		wordToGuess = tempArray[index];
+		choiceMade = true;
+		//return wordToGuess;
 	}
 	
-	public Scene createClientGui() {
-		
-		clientBox = new VBox(10, c1,b1,listItems2);
-		clientBox.setStyle("-fx-background-color: blue");
-		return new Scene(clientBox, 400, 300);
+	public void makeGuessingWord() {
+		// PARTH -> 2
+		// __R__
+		// PRANAV -> 
+		// __A_A_
+		String word = wordToGuess;
+		Random randomNumber = new Random();
+		int index = randomNumber.nextInt(word.length() - 1);
+		char temp[] = wordToGuess.toCharArray();
+		char ch = word.charAt(index);
+		wordArray = new char[word.length()];
+		for (int i = 0; i < word.length(); i++) {
+			if(temp[i] == ch) {
+				wordArray[i] = ch;
+			} else if (temp[i] == ' '){
+				wordArray[i] = ' ';
+			} else {
+				wordArray[i] = '_';
+			}
+			GuessingString = GuessingString + wordArray[i] + " ";
+		}
+		//GuessingString = GuessingString.toUpperCase();
+		System.out.println("WORD CHOSEN : " + word);
+		System.out.println("STRING GENERATED : " + GuessingString);
+//		return GuessingString;
+	}
+	public boolean checkExists(char ch) {
+		String dummy = "";
+		for (int i = 0; i < wordToGuess.length(); i++) {
+			//System.out.println(wordArray);
+			if(wordToGuess.charAt(i) == ch) {
+				wordArray[i] = ch;
+				validChar = true;
+			}
+		}
+		if(validChar) {
+			winFlag = true;
+			for (int i = 0; i < wordToGuess.length(); i++) {
+				if(wordArray[i] == '_') {
+					winFlag = false;
+				}
+				dummy = dummy + wordArray[i] + " ";
+			}
+			GuessingString = dummy;
+			if(winFlag) {
+				//GuessingString = "YAYY!";
+				winArray[attemptIndex] = true;
+				winCounter++;
+			}
+		}
+		return validChar;
 		
 	}
-
 }
