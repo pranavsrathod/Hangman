@@ -68,14 +68,14 @@ public class Server{
 				this.count = count;	
 			}
 			
-			public void updateClients(String message) {
-				for(int i = 0; i < clients.size(); i++) {
-					ClientThread t = clients.get(i);
+			public void updateClients(GameStatus message) {
+//				for(int i = 0; i < clients.size(); i++) {
+//					ClientThread t = clients.get(i);
 					try {
-					 t.out.writeObject(message);
+					 this.out.writeObject(message);
 					}
 					catch(Exception e) {}
-				}
+//  			}
 			}
 			
 			public void run(){
@@ -89,18 +89,26 @@ public class Server{
 					System.out.println("Streams not open");
 				}
 				
-				updateClients("new client on server: client #"+count);
-					
+//				updateClients("new client on server: client #"+count);
+				callback.accept("new client on server: client #"+ count);
 				 while(true) {
 					    try {
-					    	String data = in.readObject().toString();
-					    	callback.accept("client: " + count + " sent: " + data);
-					    	updateClients("client #"+count+" said: "+data);
-					    	
+					    	GameStatus data = (GameStatus)in.readObject();
+					    	callback.accept("client: " + count + " sent: " + data.guess_letter);
+					    	if (data.choiceMade) {
+					    		data.getWord(data.currentCategory);
+					    		data.makeGuessingWord();
+					    		callback.accept("Category Picked " + data.currentCategory + " Word to guess : " + data.wordToGuess);
+					    		data.choiceMade = false;
+					    	}
+					    	//updateClients("client #"+count+" said: "+data);
+					    	// callback.accept("client #"+count+" said: "+data);
+					    	updateClients(data);
 					    	}
 					    catch(Exception e) {
 					    	callback.accept("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
-					    	updateClients("Client #"+count+" has left the server!");
+			
+					    	callback.accept("Client #"+count+" has left the server!");
 					    	clients.remove(this);
 					    	break;
 					    }
