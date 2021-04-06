@@ -101,6 +101,15 @@ public class Server{
 					    		callback.accept("Category Picked " + data.currentCategory + " Word to guess : " + data.wordToGuess);
 					    		data.choiceMade = false;
 					    	}
+					    	if(data.sentChar) {
+					    		if(data.checkExists(data.guess_letter)) {
+					    			callback.accept("Letter " + data.guess_letter + " exists");
+					    		} else {
+					    			callback.accept("Letter " + data.guess_letter + " does not exist");
+					    		}
+					    		data.sentChar = false;
+					    		data.validChar = false;
+					    	}
 					    	//updateClients("client #"+count+" said: "+data);
 					    	// callback.accept("client #"+count+" said: "+data);
 					    	updateClients(data);
@@ -118,9 +127,3 @@ public class Server{
 			
 		}//end of client thread
 }
-
-
-	
-	
-
-	
