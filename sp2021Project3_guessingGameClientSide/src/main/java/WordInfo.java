@@ -1,4 +1,4 @@
-// server side
+// client side
 import java.io.Serializable;
 import java.util.HashMap;
 import javafx.scene.control.Label;
@@ -24,6 +24,10 @@ public class GameStatus  implements Serializable {
 	boolean winFlag;
 	int countWrong;
 	int winCounter;
+	int attemptsLeft[] = {3, 3, 3};
+	boolean winArray[] = {false, false, false};
+	int attemptIndex;
+	String clientMessage;
 	
 	
 	private String cat1[] = {"iron man", "captain america", "black widow", "thor", "hawkeye", "hulk", "scarlet witch", "vision", "falcon", "winter soldier",
@@ -34,17 +38,18 @@ public class GameStatus  implements Serializable {
 	
 	private String cat3[] = {"pizza", "pasta", "yogurt", "burger", "burrito", "taco", "quesadilla", "avocado", "milkshake", "banana", "sandwich", "chicken wings"};
 	
-	private String cat4[] = {"Target", "Apple", "Sony", "Champion", "toyota", "ikea", "reebok", "puma", "adidas", "nike", "samsung", "microsoft", "amazon", "nintendo"};
+	private String cat4[] = {"target", "apple", "sony", "champion", "toyota", "ikea", "reebok", "puma", "adidas", "nike", "samsung", "microsoft", "amazon", "nintendo"};
 	
-	private String cat5[] = {"USA", "india", "switzerland", "germany", "france", "kenya", "austrailia", "brazil", "argentina", "chile", "italy", "canada", "mexico", "singapore", "thailand", "japan"};
+	private String cat5[] = {"usa", "india", "switzerland", "germany", "france", "kenya", "austrailia", "brazil", "argentina", "chile", "italy", "canada", "mexico", "singapore", "thailand", "japan"};
 	
-	private String cat6[] = {"Alligator", "Antelope", "Bear", "Butterfly", "Cobra", "Deer", "Elephant", "Flamingo", "Goldfish", "Kangaroo", "Leopard", "Mongoose", "Rhinoceros", "Zebra"};
+	private String cat6[] = {"alligator", "antelope", "bear", "butterfly", "cobra", "deer", "elephant", "flamingo", "goldfish", "kangaroo", "leopard", "mongoose", "rhinoceros", "zebra"};
 	
 	
 	
 	
 	private HashMap<String, String[]> categories;
 	GameStatus(){
+		attemptIndex = -1;
 		winCounter = 0;
 		countWrong = 0;
 		sentChar = false;
@@ -104,7 +109,7 @@ public class GameStatus  implements Serializable {
 	public boolean checkExists(char ch) {
 		String dummy = "";
 		for (int i = 0; i < wordToGuess.length(); i++) {
-			System.out.println(wordArray);
+			//System.out.println(wordArray);
 			if(wordToGuess.charAt(i) == ch) {
 				wordArray[i] = ch;
 				validChar = true;
@@ -121,13 +126,11 @@ public class GameStatus  implements Serializable {
 			GuessingString = dummy;
 			if(winFlag) {
 				//GuessingString = "YAYY!";
+				winArray[attemptIndex] = true;
 				winCounter++;
 			}
 		}
 		return validChar;
 		
 	}
-	
-	
-	
 }
