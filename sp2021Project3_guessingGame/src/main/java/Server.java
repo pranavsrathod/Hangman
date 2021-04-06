@@ -106,6 +106,14 @@ public class Server{
 					    			callback.accept("Letter " + data.guess_letter + " exists");
 					    		} else {
 					    			callback.accept("Letter " + data.guess_letter + " does not exist");
+//					    			if (data.countWrong == 6) {
+//					    				callback.accept("Client: " + count + "lost");
+//					    			}
+					    			data.countWrong++;
+					    			callback.accept("Misses = " + data.countWrong);
+					    			if (data.countWrong == 6) {
+					    				callback.accept("Client: " + count + "lost");
+						    		}
 					    		}
 					    		data.sentChar = false;
 					    		data.validChar = false;
