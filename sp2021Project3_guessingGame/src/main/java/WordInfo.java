@@ -1,9 +1,23 @@
 import java.io.Serializable;
 import java.util.HashMap;
+import javafx.scene.control.Label;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+
 import java.util.*;
-public class WordInfo  implements Serializable {
-	private String wordToGuess;
-	private String currentCategory;
+public class GameStatus  implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public String wordToGuess;
+	public String currentCategory;
+	public String current_progress;
+	public char guess_letter;
+	public String GuessingString = "";
+	public char wordArray[];
+	boolean choiceMade;
 	
 	private String cat1[] = {"iron man", "captain america", "black widow", "thor", "hawkeye", "hulk", "scarlet witch", "vision", "falcon", "winter soldier",
 			"captain marvel", "nick fury", "doctor strange", "spiderman", "war machine"};
@@ -23,7 +37,12 @@ public class WordInfo  implements Serializable {
 	
 	
 	private HashMap<String, String[]> categories;
-	WordInfo(){
+	GameStatus(){
+		wordToGuess = "";
+		currentCategory = "";
+		current_progress = "";
+		guess_letter = '\0';
+		choiceMade = false;
 		categories = new HashMap<String, String[]>();
 		categories.put("Marvel", cat1);
 		categories.put("Celebrities", cat2);
@@ -34,13 +53,41 @@ public class WordInfo  implements Serializable {
 		
 	}
 	
-	public String getWord(String category) {
+	public void getWord(String category) {
 		Random randomNumber = new Random();
 		String tempArray[] = categories.get(category);
 		int index = randomNumber.nextInt(tempArray.length - 1);
 		currentCategory = category;
 		wordToGuess = tempArray[index];
-		return wordToGuess;
+		choiceMade = true;
+		//return wordToGuess;
+	}
+	
+	public void makeGuessingWord() {
+		// PARTH -> 2
+		// __R__
+		// PRANAV -> 
+		// __A_A_
+		String word = wordToGuess;
+		Random randomNumber = new Random();
+		int index = randomNumber.nextInt(word.length() - 1);
+		char temp[] = word.toCharArray();
+		char ch = word.charAt(index);
+		wordArray = new char[word.length()];
+		for (int i = 0; i < word.length(); i++) {
+			if(temp[i] == ch) {
+				wordArray[i] = ch;
+			} else if (temp[i] == ' '){
+				wordArray[i] = ' ';
+			} else {
+				wordArray[i] = '_';
+			}
+			GuessingString = GuessingString + wordArray[i] + " ";
+		}
+		GuessingString = GuessingString.toUpperCase();
+		System.out.println("WORD CHOSEN : " + word);
+		System.out.println("STRING GENERATED : " + GuessingString);
+//		return GuessingString;
 	}
 	
 	
