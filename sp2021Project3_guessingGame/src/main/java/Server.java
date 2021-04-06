@@ -99,11 +99,18 @@ public class Server{
 					    		data.getWord(data.currentCategory);
 					    		data.makeGuessingWord();
 					    		callback.accept("Category Picked " + data.currentCategory + " Word to guess : " + data.wordToGuess);
+					    		data.attemptsLeft[data.attemptIndex]--;
 					    		data.choiceMade = false;
 					    	}
 					    	if(data.sentChar) {
 					    		if(data.checkExists(data.guess_letter)) {
 					    			callback.accept("Letter " + data.guess_letter + " exists");
+					    			if (data.winFlag) {
+					    				data.clientMessage = "Category Won";
+					    				if (data.winCounter == 3) {
+					    					data.clientMessage = "Client Wins Game";
+					    				}
+					    			}
 					    		} else {
 					    			callback.accept("Letter " + data.guess_letter + " does not exist");
 //					    			if (data.countWrong == 6) {
@@ -113,6 +120,10 @@ public class Server{
 					    			callback.accept("Misses = " + data.countWrong);
 					    			if (data.countWrong == 6) {
 					    				callback.accept("Client: " + count + "lost");
+					    				data.clientMessage = "Category Lost";
+					    				if (data.attemptsLeft[data.attemptIndex] == 0) {
+					    					data.clientMessage = "Client Looses Game";
+					    				}
 						    		}
 					    		}
 					    		data.sentChar = false;
