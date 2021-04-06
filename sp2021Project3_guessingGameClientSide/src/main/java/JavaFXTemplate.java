@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,8 +24,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
 public class JavaFXTemplate extends Application {
+	private TextField t1;
 	HashMap<String, Scene> sceneMap;
 	EventHandler<ActionEvent> pressButton;
+	EventHandler<ActionEvent> categPress;
 	private BorderPane borderPane;
 	private BorderPane gamePane;
 	private Button start;
@@ -44,7 +47,11 @@ public class JavaFXTemplate extends Application {
 	private MenuItem exit;
 	private MenuItem howToPlay;
 	private ArrayList<String> categ;
+	private GameStatus object;
+	private String GuessWord;
+	private Label label2;
 	int countCat;
+	Client clientConnection;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		launch(args);
@@ -54,10 +61,12 @@ public class JavaFXTemplate extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub
+		Label port = new Label("Enter the port number: ");
+		t1 = new TextField();
 		countCat = 0;
 		categ = new ArrayList<String>();
-		HBox hBox = new HBox();
-//		HBox hBox2 = new HBox();
+		
+		
 //		VBox v1 = new VBox();
 		primaryStage.setTitle("Welcome to Hangman");
 		dummyStage = primaryStage;
@@ -66,17 +75,29 @@ public class JavaFXTemplate extends Application {
 		sceneMap = new HashMap<String,Scene>();
 		Label label = new Label("-------------- !! WELCOME TO HANGMAN !! -------------------");
 		label.setAlignment(Pos.CENTER);
-		start = new Button("Start");
-		hBox.getChildren().add(start);
+		start = new Button("Login");
+		Button help = new Button("help");
+		HBox hBox = new HBox(10, port, t1);
+//		hBox.getChildren().add(start);
 		hBox.setAlignment(Pos.CENTER);
-//		hBox2.setAlignment(Pos.CENTER);
-		root = new VBox(300,label,hBox);
+		HBox hBox2 = new HBox(10, start, help);
+		hBox2.setAlignment(Pos.CENTER);
+		root = new VBox(100,label,hBox, hBox2);
 		root.setAlignment(Pos.CENTER);
 		borderPane = new BorderPane();
 		borderPane.setCenter(root);
 				
 		Scene welcome = new Scene(borderPane, 600,600);
-		start.setOnAction(e -> primaryStage.setScene(sceneMap.get("choose")));
+		this.start.setOnAction(e-> {primaryStage.setScene(sceneMap.get("choose"));
+		primaryStage.setTitle("This is a client");
+		clientConnection = new Client(data->{
+		Platform.runLater(()->{
+			clientConnection.data = (GameStatus) data;
+			label2.setText(clientConnection.data.GuessingString);
+		});
+		}, Integer.parseInt(t1.getText()));
+		clientConnection.start();
+});
 		pressButton = new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event) {
 				Button b = (Button)event.getSource();
@@ -97,6 +118,23 @@ public class JavaFXTemplate extends Application {
 				}
 			}
 		};
+		
+		categPress = new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent event) {
+				Button array[] = {Cat1, Cat2, Cat3};
+				Button b = (Button)event.getSource();
+				b.setStyle("-fx-background-color: lightBlue");
+				for(int i = 0; i < 3; i++) {
+					if (b != array[i]) {
+						array[i].setDisable(true);
+					}
+				}
+				b.setDisable(true);
+				clientConnection.data.choiceMade = true;
+				clientConnection.data.currentCategory = b.getText();
+				clientConnection.send(clientConnection.data);
+			}
+			};
 		sceneMap.put("welcome", welcome);
 		sceneMap.put("choose", getCategories());
 		sceneMap.put("game", gameScene());
@@ -123,15 +161,21 @@ public class JavaFXTemplate extends Application {
 		VBox box = new VBox(20, instruction, b1, b2, b3, b4, b5, b6);
 		return new Scene(box, 200, 500);
 	}
+	public void setCofigurations() {
+		
+	}
 	
 	public Scene gameScene() {
 		// Text field
+		Cat1.setOnAction(categPress);
+		Cat2.setOnAction(categPress);
+		Cat3.setOnAction(categPress);
 		TextField t1 = new TextField();
 		t1.setPrefWidth(50);
 		// All labels
 		Label label = new Label("Categories");
 		label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-		Label label2 = new Label("_ _ E _ _ _");
+		label2 = new Label("");
 		label2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		Label label3 = new Label("Guess the Letter:");
 		label3.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
@@ -141,6 +185,7 @@ public class JavaFXTemplate extends Application {
 		label5.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		Button check = new Button("Check");
 		Button clear = new Button("Clear");
+		
 		
 		HBox box = new HBox(10, Cat1, Cat2, Cat3);
 		box.setAlignment(Pos.CENTER);
@@ -168,7 +213,15 @@ public class JavaFXTemplate extends Application {
 		VBox gameVBox = new VBox(10, label, box, label2, box3, box2, box4);
 		gameVBox.setAlignment(Pos.CENTER);
 		// Scene Changer
-		Cat1.setOnAction(e -> dummyStage.setScene(sceneMap.get("win")));
+//		clientConnection.data.guess_letter = t1.getText();
+		check.setOnAction(e->{
+			String temp = t1.getText().toLowerCase();
+			clientConnection.data.guess_letter = temp.charAt(0);
+			clientConnection.send(clientConnection.data); 
+			t1.clear();
+			// temp = "";
+			});
+		//Cat1.setOnAction(e -> dummyStage.setScene(sceneMap.get("win")));
 		// Border Pane
 		gamePane = new BorderPane();
 		gamePane.setTop(menu);
@@ -193,3 +246,4 @@ public class JavaFXTemplate extends Application {
 	}
 
 }
+
