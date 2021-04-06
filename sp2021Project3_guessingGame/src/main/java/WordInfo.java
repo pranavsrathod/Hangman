@@ -1,3 +1,4 @@
+// server side
 import java.io.Serializable;
 import java.util.HashMap;
 import javafx.scene.control.Label;
@@ -18,6 +19,12 @@ public class GameStatus  implements Serializable {
 	public String GuessingString = "";
 	public char wordArray[];
 	boolean choiceMade;
+	boolean sentChar;
+	boolean validChar;
+	boolean winFlag;
+	int countWrong;
+	int winCounter;
+	
 	
 	private String cat1[] = {"iron man", "captain america", "black widow", "thor", "hawkeye", "hulk", "scarlet witch", "vision", "falcon", "winter soldier",
 			"captain marvel", "nick fury", "doctor strange", "spiderman", "war machine"};
@@ -38,6 +45,11 @@ public class GameStatus  implements Serializable {
 	
 	private HashMap<String, String[]> categories;
 	GameStatus(){
+		winCounter = 0;
+		countWrong = 0;
+		sentChar = false;
+		validChar = false;
+		winFlag = false;
 		wordToGuess = "";
 		currentCategory = "";
 		current_progress = "";
@@ -71,7 +83,7 @@ public class GameStatus  implements Serializable {
 		String word = wordToGuess;
 		Random randomNumber = new Random();
 		int index = randomNumber.nextInt(word.length() - 1);
-		char temp[] = word.toCharArray();
+		char temp[] = wordToGuess.toCharArray();
 		char ch = word.charAt(index);
 		wordArray = new char[word.length()];
 		for (int i = 0; i < word.length(); i++) {
@@ -89,6 +101,33 @@ public class GameStatus  implements Serializable {
 		System.out.println("STRING GENERATED : " + GuessingString);
 //		return GuessingString;
 	}
+	public boolean checkExists(char ch) {
+		String dummy = "";
+		for (int i = 0; i < wordToGuess.length(); i++) {
+			System.out.println(wordArray);
+			if(wordToGuess.charAt(i) == ch) {
+				wordArray[i] = ch;
+				validChar = true;
+			}
+		}
+		if(validChar) {
+			winFlag = true;
+			for (int i = 0; i < wordToGuess.length(); i++) {
+				if(wordArray[i] == '_') {
+					winFlag = false;
+				}
+				dummy = dummy + wordArray[i] + " ";
+			}
+			GuessingString = dummy;
+			if(winFlag) {
+				//GuessingString = "YAYY!";
+				winCounter++;
+			}
+		}
+		return validChar;
+		
+	}
+	
 	
 	
 }
