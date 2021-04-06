@@ -49,8 +49,16 @@ public class JavaFXTemplate extends Application {
 	private ArrayList<String> categ;
 	private GameStatus object;
 	private String GuessWord;
+	private Label label;
 	private Label label2;
+	private Label label3;
+	private Label label4;
+	private Label label5;
+	private Label label6;
+	private Image img;
+	private ImageView view;
 	int countCat;
+	private String image = "Hangman0.jpeg";
 	Client clientConnection;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -98,6 +106,33 @@ public class JavaFXTemplate extends Application {
 			if(clientConnection.data.winFlag) {
 				label2.setText("CATEGORY WON!! PICK ANOTHER ONE");
 			}
+			if (clientConnection.data.countWrong != 0) { 
+//				if (clientConnection.data.countWrong == 1) {
+//					image = "Hangman2.jpeg";
+//				} else if (clientConnection.data.countWrong == 2) {
+//					image = "Hangman3.jpeg";
+//				} else if (clientConnection.data.countWrong == 3) {
+//					image = "Hangman4.jpeg";
+//				} else if (clientConnection.data.countWrong == 4) {
+//					image = "Hangman5.jpeg";
+//				} else if (clientConnection.data.countWrong == 5) {
+//					image = "Hangman6.jpeg";
+//				} else {
+//					image = "Hangman7.jpeg";
+//				}
+				image = "Hangman" + (clientConnection.data.countWrong) + ".jpeg";
+				System.out.println(image);
+				img = new Image(image);
+				view = new ImageView(img);
+				view.setFitHeight(300);
+				view.setPreserveRatio(true);
+				label6.setGraphic(view);
+				label4.setText("Number of Misses: " + clientConnection.data.countWrong);
+				label5.setText("");
+			}
+//			if (clientConnection.data.countWrong == 6) {
+//				dummyStage.setScene(sceneMap.get("lose"));
+//			}
 		});
 		}, Integer.parseInt(t1.getText()));
 		clientConnection.start();
@@ -143,18 +178,26 @@ public class JavaFXTemplate extends Application {
 		sceneMap.put("choose", getCategories());
 		sceneMap.put("game", gameScene());
 		sceneMap.put("win", winScene());
+		sceneMap.put("lose", loseScene());
 		dummyStage.setScene(sceneMap.get("welcome"));
 		dummyStage.show();
 	}
 	
 	public Scene getCategories() {
 		Label instruction = new Label("Pick 3 Categories");
+		
 		b1 = new Button ("Marvel");
 		b2 = new Button("Celebrities");
+		HBox hbox = new HBox(10,b1,b2);
+		hbox.setAlignment(Pos.CENTER);
 		b3 = new Button("Food");
 		b4 = new Button("Brands");
+		HBox hbox2 = new HBox(10,b3,b4);
+		hbox2.setAlignment(Pos.CENTER);
 		b5 = new Button("Countries");
 		b6 = new Button("Animals");
+		HBox hbox3 = new HBox(10,b5,b6);
+		hbox3.setAlignment(Pos.CENTER);
 		b1.setOnAction(pressButton);
 		b2.setOnAction(pressButton);
 		b3.setOnAction(pressButton);
@@ -162,8 +205,9 @@ public class JavaFXTemplate extends Application {
 		b5.setOnAction(pressButton);
 		b6.setOnAction(pressButton);
 		
-		VBox box = new VBox(20, instruction, b1, b2, b3, b4, b5, b6);
-		return new Scene(box, 200, 500);
+		VBox box = new VBox(20, instruction, hbox, hbox2, hbox3);
+		box.setAlignment(Pos.CENTER);
+		return new Scene(box, 300, 300);
 	}
 	public void setCofigurations() {
 		
@@ -177,20 +221,26 @@ public class JavaFXTemplate extends Application {
 		TextField t1 = new TextField();
 		t1.setPrefWidth(50);
 		// All labels
-		Label label = new Label("Categories");
+		label = new Label("Categories");
 		label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		label2 = new Label("");
 		label2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-		Label label3 = new Label("Guess the Letter:");
+		label3 = new Label("Guess the Letter:");
 		label3.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-		Label label4 = new Label("Number of Misses: ");
+		label4 = new Label("Number of Misses: ");
 		label4.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-		Label label5 = new Label("N/A");
+		label5 = new Label("0");
 		label5.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		Button check = new Button("Check");
 		Button clear = new Button("Clear");
-		
-		
+		// Graphics -----------------------------------------------------
+		label6 = new Label();
+		img = new Image(image);
+		view = new ImageView(img);
+		view.setFitHeight(300);
+		view.setPreserveRatio(true);
+		label6.setGraphic(view);
+		// Graphics  ----------------------------------------------------
 		HBox box = new HBox(10, Cat1, Cat2, Cat3);
 		box.setAlignment(Pos.CENTER);
 		HBox box2 = new HBox(10, check, clear);
@@ -214,7 +264,7 @@ public class JavaFXTemplate extends Application {
 //		VBox hangMan = new VBox(10, box5, box6);
 //		hangMan.setAlignment(Pos.CENTER);
 //		VBox gameVBox = new VBox(10, label, box, label2, box3, box2, box4, label6,hangMan);
-		VBox gameVBox = new VBox(10, label, box, label2, box3, box2, box4);
+		VBox gameVBox = new VBox(10, label, box, label2, box3, box2, box4, label6);
 		gameVBox.setAlignment(Pos.CENTER);
 		// Scene Changer
 //		clientConnection.data.guess_letter = t1.getText();
@@ -241,6 +291,22 @@ public class JavaFXTemplate extends Application {
 		Button exit = new Button("Exit");
 		exit.setOnAction(e -> System.exit(0));
 		Label label = new Label("Game Over");
+		label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+		HBox hbox = new HBox(10, playAgain, exit);
+		hbox.setAlignment(Pos.CENTER);
+		VBox vbox = new VBox(100, label, hbox);
+		vbox.setAlignment(Pos.CENTER);
+		BorderPane pane = new BorderPane();
+		pane.setCenter(vbox);
+		return new Scene(pane, 400, 400);
+		
+	}
+	
+	public Scene loseScene() {
+		Button playAgain = new Button("playAgain");
+		Button exit = new Button("Exit");
+		exit.setOnAction(e -> System.exit(0));
+		Label label = new Label("YOU LOST !!");
 		label.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		HBox hbox = new HBox(10, playAgain, exit);
 		hbox.setAlignment(Pos.CENTER);
