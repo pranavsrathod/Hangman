@@ -22,6 +22,11 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -64,6 +69,7 @@ public class JavaFXTemplate extends Application {
 	int countCat;
 	private String image = "Hangman0.jpeg";
 	Client clientConnection;
+	private boolean checkIfTrue = true;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		launch(args);
@@ -140,6 +146,7 @@ public class JavaFXTemplate extends Application {
 					});
 					halt.play();
 				} else if (temp.equals("Client Wins Game")) {
+					checkIfTrue = true;
 					endMessage.setText("CONGRATULATIONS YOU WON THE GAME");
 					PauseTransition halt = new PauseTransition(Duration.seconds(3));
 					halt.setOnFinished(p -> {
@@ -167,6 +174,7 @@ public class JavaFXTemplate extends Application {
 					});
 					halt.play();
 				} else if (temp.equals("Client Looses Game")) {
+					checkIfTrue = false;
 					endMessage.setText("YOU COULD NOT SAVE, THE TEAM, GAME OVER");
 					PauseTransition halt = new PauseTransition(Duration.seconds(3));
 					halt.setOnFinished(p -> {
@@ -350,6 +358,15 @@ public class JavaFXTemplate extends Application {
 		VBox vbox = new VBox(100, endMessage, hbox);
 		vbox.setAlignment(Pos.CENTER);
 		BorderPane pane = new BorderPane();
+		if (checkIfTrue) {
+			Image newImage = new Image("Winner.gif");
+			BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
+			pane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
+		} else {
+			Image newImage = new Image("lost.gif");
+			BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
+			pane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
+		}
 		pane.setCenter(vbox);
 		return new Scene(pane, 400, 400);
 		
