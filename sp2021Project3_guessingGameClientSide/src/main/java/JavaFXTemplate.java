@@ -41,11 +41,11 @@ public class JavaFXTemplate extends Application {
 	private BorderPane borderPane;
 	private BorderPane gamePane;
 	private Button start;
-// 	private Button b1;
-// 	private Button b2;
-// 	private Button b3;
-// 	private Button b4;
-// 	private Button b5;
+ 	private Button b1;
+ 	private Button b2;
+ 	private Button b3;
+ 	private Button b4;
+ 	private Button b5;
 	private Button b6;
 	private Button Cat1 = new Button("");
 	private Button Cat2 = new Button("");
@@ -65,6 +65,8 @@ public class JavaFXTemplate extends Application {
 	private Label label3;
 	private Label label4;
 	private Label label5;
+	private String catStrings[] = new String[3];
+	private Button bArray[] = new Button[3];
 	private Label label6 = new Label();
 	Label endMessage = new Label("Game Over");
 	private Image img;
@@ -77,6 +79,7 @@ public class JavaFXTemplate extends Application {
 		// TODO Auto-generated method stub
 		launch(args);
 	}
+	EventHandler<ActionEvent> again;
 
 	//feel free to remove the starter code from this method
 	@Override
@@ -228,11 +231,25 @@ public class JavaFXTemplate extends Application {
 				} else {
 					Cat3.setText(s);
 				}
-				b.setText("PRESSED");
+				b.setText("CHOSEN");
 				b.setDisable(true);
+				catStrings[countCat] = s;
+				bArray[countCat] = b;
 				countCat++;
 				if (countCat == 3) {
+					countCat = 0;
+					Cat1.setDisable(false);
+					Cat2.setDisable(false);
+					Cat3.setDisable(false);
+					Cat1.setStyle("-fx-background-color: #ff0000; ");
+					Cat2.setStyle("-fx-background-color: #ff0000; ");
+					Cat3.setStyle("-fx-background-color: #ff0000; ");
+					for(int i = 0; i < 3; i++) {
+						bArray[i].setDisable(false);
+						bArray[i].setText(catStrings[i]);
+					}
 					dummyStage.setScene(sceneMap.get("game"));
+					label2.setText("PICK A CATEGORY");
 				}
 			}
 		};
@@ -260,8 +277,15 @@ public class JavaFXTemplate extends Application {
 				view.setFitHeight(300);
 				view.setPreserveRatio(true);
 				label6.setGraphic(view);
+				
 			}
 			};
+		again = new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent event) {
+				clientConnection.data = new GameStatus();
+				primaryStage.setScene(sceneMap.get("choose"));
+			}
+		};
 		sceneMap.put("welcome", welcome);
 		sceneMap.put("choose", getCategories());
 		sceneMap.put("game", gameScene());
@@ -275,16 +299,16 @@ public class JavaFXTemplate extends Application {
 		instruction.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
 		instruction.setStyle("-fx-background-color: white");
 		
-		Button b1 = new Button ("Marvel");
-		Button b2 = new Button("Celebrities");
+		b1 = new Button ("Marvel");
+		b2 = new Button("Celebrities");
 		HBox hbox = new HBox(10,b1,b2);
 		hbox.setAlignment(Pos.CENTER);
-		Button b3 = new Button("Food");
-		Button b4 = new Button("Brands");
+		b3 = new Button("Food");
+		b4 = new Button("Brands");
 		HBox hbox2 = new HBox(10,b3,b4);
 		hbox2.setAlignment(Pos.CENTER);
-		Button b5 = new Button("Countries");
-		Button b6 = new Button("Animals");
+		b5 = new Button("Countries");
+		b6 = new Button("Animals");
 		HBox hbox3 = new HBox(10,b5,b6);
 		hbox3.setAlignment(Pos.CENTER);
 		b1.setOnAction(pressButton);
@@ -418,12 +442,6 @@ public class JavaFXTemplate extends Application {
 		hbox.setAlignment(Pos.CENTER);
 		VBox vbox = new VBox(100, endMessage, hbox);
 		vbox.setAlignment(Pos.CENTER);
-		EventHandler<ActionEvent> again = new EventHandler<ActionEvent>(){
-			public void handle(ActionEvent event) {
-			clientConnection.data = new GameStatus();
-			dummyStage.setScene(sceneMap.get("choose"));
-			}
-		};
 		playAgain.setOnAction(again);
 		BorderPane pane = new BorderPane();
 		pane.setCenter(vbox);
