@@ -93,19 +93,18 @@ public class JavaFXTemplate extends Application {
 		countCat = 0;
 		categ = new ArrayList<String>();
 		
-		
-//		VBox v1 = new VBox();
 		primaryStage.setTitle("Welcome to Hangman");
-		dummyStage = primaryStage;
+		dummyStage = primaryStage;  // set a dummy stage
 		dummyStage.setTitle("Welcome to Hangman");
 		
-		sceneMap = new HashMap<String,Scene>();
+		sceneMap = new HashMap<String,Scene>();  // create a hashmap
 		start = new Button("Login");
 		Button help = new Button("Help?");
 		start.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		help.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		HBox hBox = new HBox(10, port, t1);
-//		hBox.getChildren().add(start);
+		
+		// adding elements to HBox
 		hBox.setAlignment(Pos.CENTER);
 		HBox hBox2 = new HBox(10, start, help);
 		hBox2.setAlignment(Pos.CENTER);
@@ -113,10 +112,14 @@ public class JavaFXTemplate extends Application {
 		root.setAlignment(Pos.CENTER);
 		borderPane = new BorderPane();
 		borderPane.setCenter(root);
+		
+		// Creating the welcome scene
 		Image newImage = new Image("Hangman.png");
 		BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
 		borderPane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
 		Scene welcome = new Scene(borderPane, 300,300);
+		
+		// If help is clicked
 		help.setOnAction(e -> {
 			 Dialog<String> dialog = new Dialog<String>();
 		     dialog.setTitle("Help?");
@@ -136,13 +139,17 @@ public class JavaFXTemplate extends Application {
 		     dialog.showAndWait();
 		});
 		
+		// when login is clicked
 		this.start.setOnAction(e-> {primaryStage.setScene(sceneMap.get("choose"));
 		primaryStage.setTitle("This is a client");
+		
+		// Whenever the contents are to be resetted
 		clientConnection = new Client(data->{
 		Platform.runLater(()->{
 			clientConnection.data = (GameStatus) data;
 			label2.setText(clientConnection.data.GuessingString);
 			
+			// changing the graphics for the hangman.
 			Button butArray[] = {Cat1, Cat2, Cat3};
 			if (clientConnection.data.countWrong != 0) {
 				image = "Hangman" + (clientConnection.data.countWrong) + ".jpeg";
@@ -152,9 +159,12 @@ public class JavaFXTemplate extends Application {
 				view.setFitHeight(300);
 				view.setPreserveRatio(true);
 				label6.setGraphic(view);
-//				label5.setText("");
 			}
+			
+			// setting the number of fails
 			label4.setText("Number of Misses: " + clientConnection.data.countWrong);
+			
+			// checks for attempts 
 			if (clientConnection.data.winFlag) {
 				String temp = clientConnection.data.clientMessage;
 				if (temp.equals("Category Won")) {
@@ -174,7 +184,8 @@ public class JavaFXTemplate extends Application {
 						clientConnection.data.clientMessage = "";
 					});
 					halt.play();
-				} else if (temp.equals("Client Wins Game")) {
+				} else if (temp.equals("Client Wins Game")) {  // Win condition
+					// Change scene if won.
 					endMessage.setText("CONGRATULATIONS YOU WON THE GAME");
 					endMessage.setStyle("-fx-background-color: white");
 					PauseTransition halt = new PauseTransition(Duration.seconds(3));
@@ -184,6 +195,7 @@ public class JavaFXTemplate extends Application {
 					halt.play();
 				}
 			}
+			// when all the attempts are over
 			if (clientConnection.data.countWrong == 6) {
 				String temp = clientConnection.data.clientMessage;
 				if (temp.equals("Category Lost")) {
@@ -191,6 +203,7 @@ public class JavaFXTemplate extends Application {
 					halt.setOnFinished(p -> {
 						label2.setText("Category Lost " + clientConnection.data.attemptsLeft[clientConnection.data.attemptIndex] + "/3 attempts from this catgory remain");
 						boolean array[] = clientConnection.data.winArray;
+						// enables the button until all attempts are used.
 						for(int i = 0; i < 3; i++) {
 							if(!array[i]) {
 								butArray[i].setDisable(false);
@@ -203,6 +216,7 @@ public class JavaFXTemplate extends Application {
 					});
 					halt.play();
 				} else if (temp.equals("Client Looses Game")) {
+					// Lose condition
 					endMessage.setText("YOU COULD NOT SAVE, THE TEAM, GAME OVER");
 					endMessage.setStyle("-fx-background-color: white");
 					PauseTransition halt = new PauseTransition(Duration.seconds(3));
@@ -212,13 +226,11 @@ public class JavaFXTemplate extends Application {
 					halt.play();
 				}
 			}
-//			if (clientConnection.data.countWrong == 6) {
-//				dummyStage.setScene(sceneMap.get("lose"));
-//			}
 		});
 		}, Integer.parseInt(t1.getText()));
 		clientConnection.start();
 });
+		// play again condition
 		pressButton = new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event) {
 				Button b = (Button)event.getSource();
@@ -254,6 +266,7 @@ public class JavaFXTemplate extends Application {
 			}
 		};
 		
+		// after category is selected
 		categPress = new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event) {
 				Button array[] = {Cat1, Cat2, Cat3};
@@ -271,6 +284,7 @@ public class JavaFXTemplate extends Application {
 				clientConnection.data.choiceMade = true;
 				clientConnection.data.currentCategory = b.getText();
 				clientConnection.send(clientConnection.data);
+				// setting the first graphic
 				image = "Hangman0.jpeg";
 				img = new Image(image);
 				view = new ImageView(img);
@@ -280,12 +294,16 @@ public class JavaFXTemplate extends Application {
 				
 			}
 			};
+			
+		// play again condition	
 		again = new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event) {
 				clientConnection.data = new GameStatus();
 				primaryStage.setScene(sceneMap.get("choose"));
 			}
 		};
+		
+		// inserting the scenes in sceneMap
 		sceneMap.put("welcome", welcome);
 		sceneMap.put("choose", getCategories());
 		sceneMap.put("game", gameScene());
@@ -294,6 +312,7 @@ public class JavaFXTemplate extends Application {
 		dummyStage.show();
 	}
 	
+	// Sets the three different categories.
 	public Scene getCategories() {
 		Label instruction = new Label("Pick 3 Categories");
 		instruction.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
@@ -327,9 +346,8 @@ public class JavaFXTemplate extends Application {
 		box.setStyle("-fx-background-color: blue");
 		return new Scene(box, 300, 300);
 	}
-
+	// game scene function
 	public Scene gameScene() {
-		// Text field
 		Cat1.setOnAction(categPress);
 		Cat2.setOnAction(categPress);
 		Cat3.setOnAction(categPress);
@@ -347,20 +365,10 @@ public class JavaFXTemplate extends Application {
 		label3.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		label4 = new Label("Number of Misses: ");
 		label4.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-//		label5 = new Label("0");
-//		label5.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		Button check = new Button("Check");
 		Button clear = new Button("Clear");
 		check.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
 		clear.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
-		// Graphics -----------------------------------------------------
-//		label6 = new Label();
-//		img = new Image(image);
-//		view = new ImageView(img);
-//		view.setFitHeight(300);
-//		view.setPreserveRatio(true);
-//		label6.setGraphic(view);
-		// Graphics  ----------------------------------------------------
 		HBox box = new HBox(10, Cat1, Cat2, Cat3);
 		box.setAlignment(Pos.CENTER);
 		HBox box2 = new HBox(10, check, clear);
@@ -369,10 +377,6 @@ public class JavaFXTemplate extends Application {
 		box3.setAlignment(Pos.CENTER);
 		HBox box4 = new HBox(10, label4);
 		box4.setAlignment(Pos.CENTER);
-//		HBox box5 = new HBox(5,label11, label7, label10);
-//		box5.setAlignment(Pos.CENTER);
-//		HBox box6 = new HBox(5,label8, label9);
-//		box6.setAlignment(Pos.CENTER);
 		// Menu
 		menu = new MenuBar();
 		options = new Menu("options");
@@ -385,17 +389,19 @@ public class JavaFXTemplate extends Application {
 		exit.setOnAction(e -> {
 			System.exit(0);
 		});
+		// How to play when pressed
 		howToPlay.setOnAction(e -> {
+			// will display a dialog box.
 			 Dialog<String> dialog = new Dialog<String>();
 		     dialog.setTitle("Help?");
 		     ButtonType type = new ButtonType("Ok", ButtonData.OK_DONE);
-		     dialog.setContentText("A train has been highjacked by a group of intruders and the crew has captured by them.\n"
+		     dialog.setContentText("A train has been highjacked by a group of intruders and the crew has been captured by them.\n"
 		    		 + "You need atleast 3 crew members to get you out of the train and get you to safety\n" 
-		    		 + "The Crew has been locked in a room which can be only opened by if you play a game of hangman, accept," 
-		    		 + " you have to guess words 3 separate categories which makes it challenging.\n"
+		    		 + "The Crew has been locked in a room which can be only opened by if you play a game of hangman," 
+		    		 + " you have to guess words in 3 separate categories which makes it challenging.\n"
 		     		 + " If you lose, the latch door beneath the crew opens and they all fall the same\n"
 		    		 + "1. Pick 3 categories that you think you are familar with.\n"
-		     		 + "2. Each category that you pick will have 3 attempt so you can answer 3 times\n"
+		     		 + "2. Each category that you pick will have 3 attempts, so you can answer 3 times\n"
 		    		 + "3. If you run out of the attempts from any category, you lose.\n"
 		     		 + "4. To win you must get words from all 3 categories right.\n"
 		    		 + "5. You must only enter one character at a time and click check to see if it exists in the word\n"
@@ -404,13 +410,9 @@ public class JavaFXTemplate extends Application {
 		     dialog.showAndWait();
 		});
 		// VBox
-//		VBox hangMan = new VBox(10, box5, box6);
-//		hangMan.setAlignment(Pos.CENTER);
-//		VBox gameVBox = new VBox(10, label, box, label2, box3, box2, box4, label6,hangMan);
 		VBox gameVBox = new VBox(10, label, box, label2, box3, box2, box4, label6);
 		gameVBox.setAlignment(Pos.CENTER);
 		// Scene Changer
-//		clientConnection.data.guess_letter = t1.getText();
 		check.setOnAction(e->{
 			String temp = t1.getText().toLowerCase();
 			if(temp.length() == 1) {
@@ -419,10 +421,8 @@ public class JavaFXTemplate extends Application {
 				clientConnection.send(clientConnection.data);
 			}
 			t1.clear();
-			// temp = "";
 			});
 		clear.setOnAction(e -> t1.clear());
-		//Cat1.setOnAction(e -> dummyStage.setScene(sceneMap.get("win")));
 		// Border Pane
 		gamePane = new BorderPane();
 		gamePane.setTop(menu);
@@ -431,6 +431,7 @@ public class JavaFXTemplate extends Application {
 		return new Scene(gamePane, 512, 512);
 	}
 	
+	// win/lose Scene
 	public Scene endScene() {
 		Image newImage = new Image("gameOver.jpg");
 		BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
@@ -447,7 +448,6 @@ public class JavaFXTemplate extends Application {
 		pane.setCenter(vbox);
 		pane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
 		return new Scene(pane, 400, 400);
-		
 	}
 
 }
