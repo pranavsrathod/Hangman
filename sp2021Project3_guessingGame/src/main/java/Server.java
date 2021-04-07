@@ -69,8 +69,6 @@ public class Server{
 			}
 			
 			public void updateClients(GameStatus message) {
-//				for(int i = 0; i < clients.size(); i++) {
-//					ClientThread t = clients.get(i);
 					try {
 					 this.out.writeObject(message);
 					}
@@ -89,12 +87,12 @@ public class Server{
 					System.out.println("Streams not open");
 				}
 				
-//				updateClients("new client on server: client #"+count);
 				callback.accept("new client on server: client #"+ count);
 				 while(true) {
 					    try {
 					    	GameStatus data = (GameStatus)in.readObject();
 					    	callback.accept("client: " + count + " sent: " + data.guess_letter);
+					    	// Prints the message of the string that is picked.
 					    	if (data.choiceMade) {
 					    		data.getWord(data.currentCategory);
 					    		data.makeGuessingWord();
@@ -102,6 +100,7 @@ public class Server{
 					    		data.attemptsLeft[data.attemptIndex]--;
 					    		data.choiceMade = false;
 					    	}
+					    	// If valid then print a message
 					    	if(data.sentChar) {
 					    		if(data.checkExists(data.guess_letter)) {
 					    			callback.accept("Letter " + data.guess_letter + " exists");
@@ -129,8 +128,6 @@ public class Server{
 					    		data.sentChar = false;
 					    		data.validChar = false;
 					    	}
-					    	//updateClients("client #"+count+" said: "+data);
-					    	// callback.accept("client #"+count+" said: "+data);
 					    	updateClients(data);
 					    	}
 					    catch(Exception e) {
