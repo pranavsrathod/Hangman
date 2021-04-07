@@ -9,11 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -80,7 +83,10 @@ public class JavaFXTemplate extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub
 		Label port = new Label("Enter the port number: ");
+		port.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
+		port.setStyle("-fx-background-color: white");
 		t1 = new TextField();
+		t1.setPrefWidth(100);
 		countCat = 0;
 		categ = new ArrayList<String>();
 		
@@ -91,21 +97,41 @@ public class JavaFXTemplate extends Application {
 		dummyStage.setTitle("Welcome to Hangman");
 		
 		sceneMap = new HashMap<String,Scene>();
-		Label label = new Label("-------------- !! WELCOME TO HANGMAN !! -------------------");
-		label.setAlignment(Pos.CENTER);
 		start = new Button("Login");
-		Button help = new Button("help");
+		Button help = new Button("Help?");
+		start.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+		help.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		HBox hBox = new HBox(10, port, t1);
 //		hBox.getChildren().add(start);
 		hBox.setAlignment(Pos.CENTER);
 		HBox hBox2 = new HBox(10, start, help);
 		hBox2.setAlignment(Pos.CENTER);
-		root = new VBox(100,label,hBox, hBox2);
+		root = new VBox(100,hBox, hBox2);
 		root.setAlignment(Pos.CENTER);
 		borderPane = new BorderPane();
 		borderPane.setCenter(root);
-		
-		Scene welcome = new Scene(borderPane, 600,600);
+		Image newImage = new Image("Hangman.png");
+		BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
+		borderPane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
+		Scene welcome = new Scene(borderPane, 300,300);
+		help.setOnAction(e -> {
+			 Dialog<String> dialog = new Dialog<String>();
+		     dialog.setTitle("Help?");
+		     ButtonType type = new ButtonType("Ok", ButtonData.OK_DONE);
+		     dialog.setContentText("A train has been highjacked by a group of intruders and the crew has captured by them.\n"
+		    		 + "You need atleast 3 crew members to get you out of the train and get you to safety\n" 
+		    		 + "The Crew has been locked in a room which can be only opened by if you play a game of hangman, accept," 
+		    		 + " you have to guess words 3 separate categories which makes it challenging.\n"
+		     		 + " If you lose, the latch door beneath the crew opens and they all fall the same\n"
+		    		 + "1. Pick 3 categories that you think you are familar with.\n"
+		     		 + "2. Each category that you pick will have 3 attempt so you can answer 3 times\n"
+		    		 + "3. If you run out of the attempts from any category, you lose.\n"
+		     		 + "4. To win you must get words from all 3 categories right.\n"
+		    		 + "5. You must only enter one character at a time and click check to see if it exists in the word\n"
+		     		 + "6. To clear Text Field press Clear\n");
+		     dialog.getDialogPane().getButtonTypes().add(type);
+		     dialog.showAndWait();
+		});
 		
 		this.start.setOnAction(e-> {primaryStage.setScene(sceneMap.get("choose"));
 		primaryStage.setTitle("This is a client");
@@ -123,7 +149,7 @@ public class JavaFXTemplate extends Application {
 				view.setFitHeight(300);
 				view.setPreserveRatio(true);
 				label6.setGraphic(view);
-				label5.setText("");
+//				label5.setText("");
 			}
 			label4.setText("Number of Misses: " + clientConnection.data.countWrong);
 			if (clientConnection.data.winFlag) {
@@ -146,8 +172,8 @@ public class JavaFXTemplate extends Application {
 					});
 					halt.play();
 				} else if (temp.equals("Client Wins Game")) {
-					checkIfTrue = true;
 					endMessage.setText("CONGRATULATIONS YOU WON THE GAME");
+					endMessage.setStyle("-fx-background-color: white");
 					PauseTransition halt = new PauseTransition(Duration.seconds(3));
 					halt.setOnFinished(p -> {
 						primaryStage.setScene(sceneMap.get("end"));
@@ -167,15 +193,15 @@ public class JavaFXTemplate extends Application {
 								butArray[i].setDisable(false);
 							}
 						}
-						currentCat.setStyle("-fx-background-color: White");
+						currentCat.setStyle("-fx-background-color: HotPink");
 						clientConnection.data.GuessingString = "";
 						clientConnection.data.countWrong = 0;
 						clientConnection.data.clientMessage = "";
 					});
 					halt.play();
 				} else if (temp.equals("Client Looses Game")) {
-					checkIfTrue = false;
 					endMessage.setText("YOU COULD NOT SAVE, THE TEAM, GAME OVER");
+					endMessage.setStyle("-fx-background-color: white");
 					PauseTransition halt = new PauseTransition(Duration.seconds(3));
 					halt.setOnFinished(p -> {
 						dummyStage.setScene(sceneMap.get("end"));
@@ -246,6 +272,8 @@ public class JavaFXTemplate extends Application {
 	
 	public Scene getCategories() {
 		Label instruction = new Label("Pick 3 Categories");
+		instruction.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
+		instruction.setStyle("-fx-background-color: white");
 		
 		b1 = new Button ("Marvel");
 		b2 = new Button("Celebrities");
@@ -265,20 +293,25 @@ public class JavaFXTemplate extends Application {
 		b4.setOnAction(pressButton);
 		b5.setOnAction(pressButton);
 		b6.setOnAction(pressButton);
-		
+		Button array[] = {b1, b2, b3, b4, b5, b6};
+		for (int i = 0; i < 6; i++) {
+			array[i].setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
+			array[i].setStyle("-fx-background-color: white");
+		}
 		VBox box = new VBox(20, instruction, hbox, hbox2, hbox3);
 		box.setAlignment(Pos.CENTER);
+		box.setStyle("-fx-background-color: blue");
 		return new Scene(box, 300, 300);
 	}
-	public void setCofigurations() {
-		
-	}
-	
+
 	public Scene gameScene() {
 		// Text field
 		Cat1.setOnAction(categPress);
 		Cat2.setOnAction(categPress);
 		Cat3.setOnAction(categPress);
+		Cat1.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
+		Cat2.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
+		Cat3.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
 		TextField t1 = new TextField();
 		t1.setPrefWidth(50);
 		// All labels
@@ -290,10 +323,12 @@ public class JavaFXTemplate extends Application {
 		label3.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		label4 = new Label("Number of Misses: ");
 		label4.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
-		label5 = new Label("0");
-		label5.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+//		label5 = new Label("0");
+//		label5.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
 		Button check = new Button("Check");
 		Button clear = new Button("Clear");
+		check.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
+		clear.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 12));
 		// Graphics -----------------------------------------------------
 //		label6 = new Label();
 //		img = new Image(image);
@@ -308,7 +343,7 @@ public class JavaFXTemplate extends Application {
 		box2.setAlignment(Pos.CENTER);
 		HBox box3 = new HBox(10, label3, t1);
 		box3.setAlignment(Pos.CENTER);
-		HBox box4 = new HBox(10, label4, label5);
+		HBox box4 = new HBox(10, label4);
 		box4.setAlignment(Pos.CENTER);
 //		HBox box5 = new HBox(5,label11, label7, label10);
 //		box5.setAlignment(Pos.CENTER);
@@ -321,6 +356,29 @@ public class JavaFXTemplate extends Application {
 		howToPlay = new MenuItem("Help");
 		options.getItems().addAll(howToPlay, exit);
 		menu.getMenus().addAll(options);
+		
+		// set menu on action
+		exit.setOnAction(e -> {
+			System.exit(0);
+		});
+		howToPlay.setOnAction(e -> {
+			 Dialog<String> dialog = new Dialog<String>();
+		     dialog.setTitle("Help?");
+		     ButtonType type = new ButtonType("Ok", ButtonData.OK_DONE);
+		     dialog.setContentText("A train has been highjacked by a group of intruders and the crew has captured by them.\n"
+		    		 + "You need atleast 3 crew members to get you out of the train and get you to safety\n" 
+		    		 + "The Crew has been locked in a room which can be only opened by if you play a game of hangman, accept," 
+		    		 + " you have to guess words 3 separate categories which makes it challenging.\n"
+		     		 + " If you lose, the latch door beneath the crew opens and they all fall the same\n"
+		    		 + "1. Pick 3 categories that you think you are familar with.\n"
+		     		 + "2. Each category that you pick will have 3 attempt so you can answer 3 times\n"
+		    		 + "3. If you run out of the attempts from any category, you lose.\n"
+		     		 + "4. To win you must get words from all 3 categories right.\n"
+		    		 + "5. You must only enter one character at a time and click check to see if it exists in the word\n"
+		     		 + "6. To clear Text Field press Clear\n");
+		     dialog.getDialogPane().getButtonTypes().add(type);
+		     dialog.showAndWait();
+		});
 		// VBox
 //		VBox hangMan = new VBox(10, box5, box6);
 //		hangMan.setAlignment(Pos.CENTER);
@@ -345,10 +403,13 @@ public class JavaFXTemplate extends Application {
 		gamePane = new BorderPane();
 		gamePane.setTop(menu);
 		gamePane.setCenter(gameVBox);
-		return new Scene(gamePane, 600, 600);
+		gamePane.setStyle("-fx-background-color: aquamarine");
+		return new Scene(gamePane, 512, 512);
 	}
 	
 	public Scene endScene() {
+		Image newImage = new Image("gameOver.jpg");
+		BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
 		Button playAgain = new Button("playAgain");
 		Button exit = new Button("Exit");
 		exit.setOnAction(e -> System.exit(0));
@@ -357,17 +418,16 @@ public class JavaFXTemplate extends Application {
 		hbox.setAlignment(Pos.CENTER);
 		VBox vbox = new VBox(100, endMessage, hbox);
 		vbox.setAlignment(Pos.CENTER);
+		EventHandler<ActionEvent> again = new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent event) {
+			clientConnection.data = new GameStatus();
+			dummyStage.setScene(sceneMap.get("choose"));
+			}
+		};
+		playAgain.setOnAction(again);
 		BorderPane pane = new BorderPane();
-		if (checkIfTrue) {
-			Image newImage = new Image("Winner.gif");
-			BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
-			pane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
-		} else {
-			Image newImage = new Image("lost.gif");
-			BackgroundSize Size = new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false);
-			pane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
-		}
 		pane.setCenter(vbox);
+		pane.setBackground(new Background(new BackgroundImage(newImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, Size)));
 		return new Scene(pane, 400, 400);
 		
 	}
