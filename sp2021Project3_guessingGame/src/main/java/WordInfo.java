@@ -1,4 +1,4 @@
-// server side
+// client side
 import java.io.Serializable;
 import java.util.HashMap;
 import javafx.scene.control.Label;
@@ -29,7 +29,7 @@ public class GameStatus  implements Serializable {
 	int attemptIndex;
 	String clientMessage;
 	
-	
+	// All the Arraylist elements.
 	private String cat1[] = {"iron man", "captain america", "black widow", "thor", "hawkeye", "hulk", "scarlet witch", "vision", "falcon", "winter soldier",
 			"captain marvel", "nick fury", "doctor strange", "spiderman", "war machine"};
 	
@@ -48,6 +48,7 @@ public class GameStatus  implements Serializable {
 	
 	
 	private HashMap<String, String[]> categories;
+	// constructor
 	GameStatus(){
 		attemptIndex = -1;
 		winCounter = 0;
@@ -70,6 +71,7 @@ public class GameStatus  implements Serializable {
 		
 	}
 	
+	// stores the word in wordToGuess string.
 	public void getWord(String category) {
 		Random randomNumber = new Random();
 		String tempArray[] = categories.get(category);
@@ -77,20 +79,17 @@ public class GameStatus  implements Serializable {
 		currentCategory = category;
 		wordToGuess = tempArray[index];
 		choiceMade = true;
-		//return wordToGuess;
 	}
 	
+	// making a default string with random words.
 	public void makeGuessingWord() {
-		// PARTH -> 2
-		// __R__
-		// PRANAV -> 
-		// __A_A_
 		String word = wordToGuess;
 		Random randomNumber = new Random();
 		int index = randomNumber.nextInt(word.length() - 1);
 		char temp[] = wordToGuess.toCharArray();
 		char ch = word.charAt(index);
 		wordArray = new char[word.length()];
+		// Updating the string through the loop with random words and "_"
 		for (int i = 0; i < word.length(); i++) {
 			if(temp[i] == ch) {
 				wordArray[i] = ch;
@@ -101,11 +100,12 @@ public class GameStatus  implements Serializable {
 			}
 			GuessingString = GuessingString + wordArray[i] + " ";
 		}
-		//GuessingString = GuessingString.toUpperCase();
+		GuessingString = GuessingString.toUpperCase();
 		System.out.println("WORD CHOSEN : " + word);
 		System.out.println("STRING GENERATED : " + GuessingString);
-//		return GuessingString;
 	}
+	
+	// Checks if the character is valid or not
 	public boolean checkExists(char ch) {
 		String dummy = "";
 		for (int i = 0; i < wordToGuess.length(); i++) {
