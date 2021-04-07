@@ -14,36 +14,32 @@ public class Client extends Thread{
 	
 	ObjectOutputStream out;
 	ObjectInputStream in;
-	//private String ipAddress;
-	private int port;
-	WordInfo wordsClass;
+	int portNumber;
+	GameStatus data = new GameStatus();
 	
 	private Consumer<Serializable> callback;
 	
-	Client(Consumer<Serializable> call, int assignPort){
-		wordsClass = new WordInfo();
+	Client(Consumer<Serializable> call, int port){
+		portNumber = port;
 		callback = call;
-//		String assignIp
-//		ipAddress = assignIp;
-		port = assignPort;
 	}
 	
 	public void run() {
 		
 		try {
-		socketClient= new Socket("127.0.0.1",port);
+		socketClient= new Socket("127.0.0.1",portNumber);
 	    out = new ObjectOutputStream(socketClient.getOutputStream());
 	    in = new ObjectInputStream(socketClient.getInputStream());
 	    socketClient.setTcpNoDelay(true);
 		}
 		catch(Exception e) {
-			System.out.println("CLIENT THREAD FAILED TO LAUNCH");
+			System.out.println("Failed!!");
 		}
 		
 		while(true) {
 			 
 			try {
-			String message = in.readObject().toString();
+			GameStatus message = (GameStatus) in.readObject();
 			callback.accept(message);
 			}
 			catch(Exception e) {}
@@ -51,10 +47,10 @@ public class Client extends Thread{
 	
     }
 	
-	public void send(WordInfo object) {
+	public void send(GameStatus data) {
 		
 		try {
-			out.writeObject(object);
+			out.writeObject(data);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
